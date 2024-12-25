@@ -11,7 +11,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained('vinai/phobert-base')
     
     try:
-        phobert, cnn = load_models(
+        phobert, c nn = load_models(
             'phobert_cnn_model_part1_task2a_2.pt',
             'phobert_cnn_model_part2_task2a_2.pt'
         )
@@ -34,7 +34,7 @@ def main():
                 print("Vui lòng nhập văn bản!")
                 continue
             predicted_label = predict_text(text, phobert, cnn, tokenizer, device)
-            print(f"\nKết quả: {label_meanings[predicted_label]}")
+            print(f"\nKết quả: {predicted_label}")
             
     except Exception as e:
         print(f"Đã xảy ra lỗi: {str(e)}")
