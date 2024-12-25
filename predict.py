@@ -1,11 +1,10 @@
 import torch
 
 def predict_text(text, phobert, cnn, tokenizer, device):
-    """Predict the label for a given text"""
     encoded_dict = tokenizer.encode_plus(
         text,
         add_special_tokens=True,
-        max_length=20,
+        max_length=258,
         padding='max_length',
         truncation=True,
         return_attention_mask=True,
