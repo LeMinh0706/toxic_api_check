@@ -11,9 +11,10 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained('vinai/phobert-base')
     
     try:
-        phobert, c nn = load_models(
+        phobert, cnn = load_models(
             'phobert_cnn_model_part1_task2a_2.pt',
-            'phobert_cnn_model_part2_task2a_2.pt'
+            'phobert_cnn_model_part2_task2a_2.pt',
+            device
         )
         
         label_meanings = {

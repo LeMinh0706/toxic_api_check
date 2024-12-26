@@ -5,10 +5,11 @@ from model import load_models
 from predict import predict_text
 from typing import Union
 import uvicorn
-
-from fastapi import FastAPI, HTTPException
+from datetime import datetime
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import shutil
 
 import sys
 sys.modules['__main__'].CNN = CNN
@@ -50,6 +51,21 @@ def predict(sentence: Sentence):
         return {"code":200,"message":meanings[label], "data":{"label":label}}
     except Exception as e:
         raise HTTPException(status_code=200, detail={"code": 500, "message": str(e)})
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+    file_extension = file.filename.split('.')[-1] 
+    new_filename = f"{current_time}.{file_extension}"
+
+    file_location = f"uploads/{new_filename}"
+
+    with open(file_location, "wb") as f:
+        shutil.copyfileobj(file.file, f)
+    
+    return {"code":200,"message":"Ok", "data":{"label":file_location}}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=9200)
