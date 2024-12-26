@@ -5,6 +5,8 @@ from model import load_models
 from predict import predict_text
 from typing import Union
 import uvicorn
+from sensitive import sensitive
+from ultralytics import YOLOv10
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +14,9 @@ from pydantic import BaseModel
 import shutil
 
 import sys
+
+yolo = YOLOv10('best.pt')
+
 sys.modules['__main__'].CNN = CNN
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -53,18 +58,24 @@ def predict(sentence: Sentence):
         raise HTTPException(status_code=200, detail={"code": 500, "message": str(e)})
 
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+def upload_file(file: UploadFile = File(...)):
 
-    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_extension = file.filename.split('.')[-1] 
-    new_filename = f"{current_time}.{file_extension}"
+    try:
+        current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+        file_extension = file.filename.split('.')[-1] 
+        new_filename = f"{current_time}.{file_extension}"
 
-    file_location = f"uploads/{new_filename}"
+        file_location = f"uploads/{new_filename}"
 
-    with open(file_location, "wb") as f:
-        shutil.copyfileobj(file.file, f)
-    
-    return {"code":200,"message":"Ok", "data":{"label":file_location}}
+        with open(file_location, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+
+        label, message = sensitive(yolo, file_location)
+
+        return {"code":200,"message":message, "data":{"file":file_location, "label":label}}
+
+    except Exception as e:
+        raise HTTPException(status_code=200, detail={"code": 500, "message": str(e)})
 
 
 if __name__ == "__main__":
