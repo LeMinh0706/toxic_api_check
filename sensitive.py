@@ -2,7 +2,7 @@ def sensitive(yolo, location):
 
     results = yolo(source = location, conf = 0.25, save = False)
     class_id=6
-    class_label="Ok"
+    class_label=""
 
     for box in results[0].boxes:
             class_id = int(box.cls)  
