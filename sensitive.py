@@ -1,6 +1,6 @@
 def sensitive(yolo, location):
 
-    results = yolo(source = location, conf = 0.25, save = False)
+    results = yolo(source = location, conf = 0.4, save = False)
     class_id=6
     class_label=""
 
